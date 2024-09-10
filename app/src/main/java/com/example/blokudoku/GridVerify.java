@@ -50,17 +50,18 @@ public class GridVerify {
             });
         }
         //check for squares
-//        for (int i = 0; i < grid.length; i++) {
-//            int sum=0;
-//            for (int j = 0; j < grid[i].length; j++) {
-//                int x = (i%3)*3 + j%3;
-//                int y = (i-i%3)*3 + (j-j%3);
-//                sum+=grid[i][j];
-//            }
-//            if (sum==8) results.add(new int[]{
-//                    2,i
-//            });
-//        }
+        for (int i = 0; i < grid.length; i++) {
+            int sum=0;
+            for (int j = 0; j < grid[i].length; j++) {
+                int x = (i%3)*3 + j%3;
+                int y = (i-(i%3)) + (j-(j%3))/3;
+                Log.d("ind",""+x+" "+y);
+                sum+=grid[x][y];
+            }
+            if (sum>8) results.add(new int[]{
+                    2,i
+            });
+        }
         return results;
     }
     public static int[][] deleteConnected(ArrayList<int[]> connected, int[][] grid){
@@ -76,8 +77,8 @@ public class GridVerify {
                     break;
                 case 2:
                     for (int i = 0; i < grid[res[1]].length; i++) {
-                        int x= (res[1]%3)*3 + i%3;
-                        int y= (res[1]-res[1]%3)*3 + (i-i%3);
+                        int x = (res[1]%3)*3 + i%3;
+                        int y = (res[1]-(res[1]%3)) + (i-(i%3))/3;
                         grid[x][y] = 0;
                     }
                     break;

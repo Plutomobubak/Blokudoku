@@ -9,9 +9,9 @@
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="221dp"
-        android:layout_height="70dp"
-        android:layout_marginStart="92dp"
+        android:layout_width="342dp"
+        android:layout_height="66dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:text="Balls"
         android:textAlignment="center"
@@ -21,9 +21,9 @@
 
     <LinearLayout
         android:id="@+id/blocks"
-        android:layout_width="412dp"
-        android:layout_height="133dp"
-        android:layout_marginBottom="32dp"
+        android:layout_width="414dp"
+        android:layout_height="176dp"
+        android:layout_marginBottom="16dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"></LinearLayout>

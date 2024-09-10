@@ -26,7 +26,7 @@ public class DragDrop {
                     case DragEvent.ACTION_DRAG_STARTED:
                         // Save the original color before starting the drag
                         if (v instanceof ImageView){
-                            for (int i = 0; i < Grid.imageViews.length; i++) {
+                            for (int i = 0; i < Grid.imageViews.length-2; i++) {
                                 for (int j = 0; j < Grid.imageViews[i].length; j++) {
                                     ColorDrawable col = (ColorDrawable)Grid.imageViews[i][j].getBackground();
                                     originalColors[i][j] = col.getColor();
@@ -40,6 +40,8 @@ public class DragDrop {
                         if (v instanceof ImageView) {
                             View dragged = (View) event.getLocalState(); // Get the dragged view
                             int[] index = getImageViewIndex(((ImageView) v));
+                            index[0] -= 2;
+
                             int[][] matrix = new int[0][0];
                             for (Block block:blocks) {
                                 for(View view:block.views)
@@ -48,6 +50,9 @@ public class DragDrop {
                                         break;
                                     }
                             }
+                            if(matrix[0].length >3)index[1]-=2;
+                            else if (matrix[0].length >1)index[1] -= 1;
+                            if (index[0]<0 || index[1]<0)return false;
                             if(GridVerify.verifyPlacable(index,Grid.grid,matrix)){
                                 for (int i = 0; i < matrix.length; i++) {
                                     for (int j = 0; j < matrix[i].length; j++) {
@@ -62,7 +67,7 @@ public class DragDrop {
 
                     case DragEvent.ACTION_DRAG_EXITED:
                         // Reset the background color to the original color when drag exits
-                        for (int i = 0; i < Grid.imageViews.length; i++) {
+                        for (int i = 0; i < Grid.imageViews.length-2; i++) {
                             for (int j = 0; j < Grid.imageViews[i].length; j++) {
                                 Grid.imageViews[i][j].setBackgroundColor(originalColors[i][j]);
                             }
@@ -73,6 +78,7 @@ public class DragDrop {
                         if (v instanceof ImageView) {
                             View dragged = (View) event.getLocalState(); // Get the dragged view
                             int[] index = getImageViewIndex(((ImageView) v));
+                            index[0] -= 2;
                             int[][] matrix = new int[0][0];
                             for (Block block:blocks) {
                                 for(View view:block.views)
@@ -81,6 +87,9 @@ public class DragDrop {
                                         break;
                                     }
                             }
+                            if(matrix[0].length >3)index[1]-=2;
+                            if (matrix[0].length >1)index[1] -= 1;
+                            if (index[0]<0 || index[1]<0)return false;
                             if(GridVerify.verifyPlacable(index,Grid.grid,matrix)){
                                 for (int i = 0; i < matrix.length; i++) {
                                     for (int j = 0; j < matrix[i].length; j++) {

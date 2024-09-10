@@ -2,12 +2,17 @@ package com.example.blokudoku;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.view.MotionEvent;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.view.View.DragShadowBuilder;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -17,13 +22,79 @@ import java.util.Random;
 
 public class Blocks {
         public static Block[] blocks={
+                // noodles
+                // very short noodle
+                new Block(new int[][]{
+                        {1}
+                }),
+                new Block(new int[][]{
+                        {1,1}
+                }),
+                new Block(new int[][]{
+                        {1},
+                        {1}
+                }),
+                new Block(new int[][]{
+                        {1,1,1}
+                }),
+                new Block(new int[][]{
+                        {1},
+                        {1},
+                        {1}
+                }),
+                new Block(new int[][]{
+                        {1,1,1,1}
+                }),
+                new Block(new int[][]{
+                        {1},
+                        {1},
+                        {1},
+                        {1}
+                }),
+                new Block(new int[][]{
+                        {1,1,1,1,1}
+                }),
+                new Block(new int[][]{
+                        {1},
+                        {1},
+                        {1},
+                        {1},
+                        {1}
+                }),
+                // L-shapes
+                //smol
+                new Block(new int[][]{
+                        {1,0},
+                        {1,1}
+                }),
+                new Block(new int[][]{
+                        {1,1},
+                        {1,0}
+                }),
+                new Block(new int[][]{
+                        {1,1},
+                        {0,1}
+                }),
+                new Block(new int[][]{
+                        {0,1},
+                        {1,1}
+                }),
+                //medium
                 new Block(new int[][]{
                         {0,0,1},
                         {1,1,1}
                 }),
                 new Block(new int[][]{
+                        {1,0,0},
+                        {1,1,1}
+                }),
+                new Block(new int[][]{
                         {1,1,1},
                         {1,0,0}
+                }),
+                new Block(new int[][]{
+                        {1,1,1},
+                        {0,0,1}
                 }),
                 new Block(new int[][]{
                         {1,0},
@@ -32,8 +103,106 @@ public class Blocks {
                 }),
                 new Block(new int[][]{
                         {1,1},
+                        {1,0},
+                        {1,0}
+                }),
+                new Block(new int[][]{
+                        {1,1},
                         {0,1},
                         {0,1}
+                }),
+                new Block(new int[][]{
+                        {0,1},
+                        {0,1},
+                        {1,1}
+                }),
+                //big
+                new Block(new int[][]{
+                        {0,0,1},
+                        {0,0,1},
+                        {1,1,1}
+                }),
+                new Block(new int[][]{
+                        {1,0,0},
+                        {1,0,0},
+                        {1,1,1}
+                }),
+                new Block(new int[][]{
+                        {1,1,1},
+                        {0,0,1},
+                        {0,0,1}
+                }),
+                new Block(new int[][]{
+                        {1,1,1},
+                        {1,0,0},
+                        {1,0,0}
+                }),
+                //T- and cross
+                new Block(new int[][]{
+                        {1,0},
+                        {1,1},
+                        {1,0}
+                }),
+                new Block(new int[][]{
+                        {0,1},
+                        {1,1},
+                        {0,1}
+                }),
+                new Block(new int[][]{
+                        {1,1,1},
+                        {0,1,0}
+                }),
+                new Block(new int[][]{
+                        {0,1,0},
+                        {1,1,1}
+                }),
+                new Block(new int[][]{
+                        {0,1,0},
+                        {1,1,1},
+                        {0,1,0}
+                }),
+                new Block(new int[][]{
+                        {1,1,1},
+                        {0,1,0},
+                        {0,1,0}
+                }),
+                new Block(new int[][]{
+                        {0,1,0},
+                        {0,1,0},
+                        {1,1,1}
+                }),
+                new Block(new int[][]{
+                        {1,0,0},
+                        {1,1,1},
+                        {1,0,0}
+                }),
+                new Block(new int[][]{
+                        {0,0,1},
+                        {1,1,1},
+                        {0,0,1}
+                }),
+                // Blocks
+                new Block(new int[][]{
+                        {1,1},
+                        {1,1}
+                }),
+                new Block(new int[][]{
+                        {1,1},
+                        {1,0},
+                        {1,1}
+                }),
+                new Block(new int[][]{
+                        {1,1},
+                        {0,1},
+                        {1,1}
+                }),
+                new Block(new int[][]{
+                        {1,1,1},
+                        {1,0,1}
+                }),
+                new Block(new int[][]{
+                        {1,0,1},
+                        {1,1,1}
                 }),
         };
         private static Context context;
@@ -51,7 +220,7 @@ public class Blocks {
         }
         // Method to render a block from a matrix
         public static void renderBlock(Context context, LinearLayout layout, int blockInt) {
-            int cellSize = 100; // Size of each cell (e.g., 100x100dp)
+            int cellSize = (int) (100f /1.3f); // Size of each cell (e.g., 100x100dp)
 
             ConstraintLayout container = new ConstraintLayout(context);
             // Create a 2D array to hold references to ImageView elements
@@ -134,7 +303,7 @@ public class Blocks {
                 public boolean onTouch(View v, MotionEvent event) {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
                         ClipData data = ClipData.newPlainText("", "");
-                        View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                        BlockDragShadowBuilder shadowBuilder = new BlockDragShadowBuilder(v);
                         v.startDragAndDrop(data, shadowBuilder, v, 0);
                         return true;
                     } else {
@@ -144,4 +313,35 @@ public class Blocks {
             });
             layout.addView(container);
         }
+
+    public static class BlockDragShadowBuilder extends DragShadowBuilder {
+        private final float scaleFactor = 1.3f; // You can change this scale factor
+        private final float touchShiftFactor = 1.5f;
+        public BlockDragShadowBuilder(View view) {
+            super(view);
+        }
+
+        @Override
+        public void onProvideShadowMetrics(Point size, Point touch) {
+            View view = getView();
+
+            // Set the shadow size to a scaled-up version of the view's size
+            int width = (int) (view.getWidth() * scaleFactor);
+            int height = (int) (view.getHeight() * scaleFactor);
+
+            // Set the shadow size
+            size.set(width, height);
+
+            // Set the touch point to the center of the scaled view
+            int shiftedTouchY = 250;//(int) (height * touchShiftFactor);
+            touch.set(width/2 +25, shiftedTouchY);
+        }
+
+        @Override
+        public void onDrawShadow(Canvas canvas) {
+            // Scale the canvas before drawing the shadow
+            canvas.scale(scaleFactor, scaleFactor);
+            getView().draw(canvas);
+        }
+    }
 }

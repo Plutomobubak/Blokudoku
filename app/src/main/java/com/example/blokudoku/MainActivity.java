@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         TextView title = findViewById(R.id.title);
-        title.setText("Nice balls");
+        title.setText("Blokucocku");
 
         // Find the main ConstraintLayout from the XML
         ConstraintLayout mainLayout = findViewById(R.id.main);
