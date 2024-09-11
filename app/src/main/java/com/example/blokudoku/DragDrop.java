@@ -3,11 +3,14 @@ package com.example.blokudoku;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,11 +57,37 @@ public class DragDrop {
                             else if (matrix[0].length >1)index[1] -= 1;
                             if (index[0]<0 || index[1]<0)return false;
                             if(GridVerify.verifyPlacable(index,Grid.grid,matrix)){
+                                int[][] fGrid = java.util.Arrays.stream(Grid.grid).map(int[]::clone).toArray($ -> Grid.grid.clone());
                                 for (int i = 0; i < matrix.length; i++) {
                                     for (int j = 0; j < matrix[i].length; j++) {
                                         if(matrix[i][j]==1){
+                                                fGrid[index[0]+i][index[1]+j] = 1;
                                                 Grid.imageViews[index[0] + i][index[1] + j].setBackgroundColor(Color.parseColor("#999999"));
                                         }
+                                    }
+                                }
+                                // Highlight possible connections
+                                ArrayList<int[]> connected = GridVerify.verifyConnected(fGrid);
+                                for(int[] res:connected){
+                                    Log.d("connections",Arrays.toString(res));
+                                    switch(res[0]) {
+                                        case 0:
+                                            for (int i = 0; i < fGrid.length; i++) {
+                                                Grid.imageViews[res[1]][i].setBackgroundColor(Color.parseColor("#ccccff"));
+                                            }
+                                            break;
+                                        case 1:
+                                            for (int i = 0; i < fGrid.length; i++) {
+                                                Grid.imageViews[i][res[1]].setBackgroundColor(Color.parseColor("#ccccff"));
+                                            }
+                                            break;
+                                        case 2:
+                                            for (int i = 0; i < fGrid[res[1]].length; i++) {
+                                                int x = (res[1]%3)*3 + i%3;
+                                                int y = (res[1]-(res[1]%3)) + (i-(i%3))/3;
+                                                Grid.imageViews[x][y].setBackgroundColor(Color.parseColor("#ccccff"));
+                                            }
+                                            break;
                                     }
                                 }
                             }
@@ -81,30 +110,48 @@ public class DragDrop {
                             index[0] -= 2;
                             int[][] matrix = new int[0][0];
                             for (Block block:blocks) {
-                                for(View view:block.views)
+                                for(ConstraintLayout view:block.views)
                                     if (view == dragged) {
                                         matrix = block.matrix;
+                                        if(matrix[0].length >3)index[1]-=2;
+                                        else if (matrix[0].length >1)index[1] -= 1;
+                                        if (index[0]<0 || index[1]<0)return false;
+                                        if (!GridVerify.verifyPlacable(index,Grid.grid,matrix))return false;
+                                        block.views.remove(view);
                                         break;
                                     }
                             }
-                            if(matrix[0].length >3)index[1]-=2;
-                            if (matrix[0].length >1)index[1] -= 1;
-                            if (index[0]<0 || index[1]<0)return false;
-                            if(GridVerify.verifyPlacable(index,Grid.grid,matrix)){
-                                for (int i = 0; i < matrix.length; i++) {
-                                    for (int j = 0; j < matrix[i].length; j++) {
-                                        if (matrix[i][j] == 1) {
-                                                Grid.imageViews[index[0] + i][index[1] + j].setBackgroundColor(Color.parseColor("#3333ff"));
-                                                Grid.grid[index[0]+i][index[1]+j] = 1;
+                            int blockSize = 0;
+                            for (int i = 0; i < matrix.length; i++) {
+                                for (int j = 0; j < matrix[i].length; j++) {
+                                    if (matrix[i][j] == 1) {
+                                            blockSize++;
+                                            Grid.imageViews[index[0] + i][index[1] + j].setBackgroundColor(Color.parseColor("#3333ff"));
+                                            Grid.grid[index[0]+i][index[1]+j] = 1;
+                                    }
+                                }
+                            }
+                            ArrayList<int[]> res = GridVerify.verifyConnected(Grid.grid);
+                            int deleted = GridVerify.deleteConnected(res,Grid.grid);
+                            Grid.updateGrid();
+                            ScoreManager.updateScore(deleted,res.size(),blockSize);
+                            ((ViewGroup)dragged.getParent()).removeView(dragged);
+                            if(Blocks.blockLayout.getChildCount()<1)Blocks.generateBlocks();
+                            // update placeability
+                            boolean anyPlaceable = false;
+                            for (Block block:blocks) {
+                                for (ConstraintLayout view : block.views) {
+                                    for (int i = 0; i < view.getChildCount(); i++) {
+                                        if (((GradientDrawable)view.getChildAt(i).getBackground()).getColor().getDefaultColor()!=Color.TRANSPARENT) {
+                                            boolean placeable = block.checkPlaceable(Grid.grid);
+                                            if (placeable) anyPlaceable = true;
+                                            ((GradientDrawable)view.getChildAt(i).getBackground()).setColor(placeable? Color.parseColor("#3333ff"):Color.parseColor("#ccccff"));
                                         }
                                     }
                                 }
-                                ArrayList<int[]> res = GridVerify.verifyConnected(Grid.grid);
-                                Log.d("Connected",Arrays.toString(res.toArray()));
-                                GridVerify.deleteConnected(res,Grid.grid);
-                                Grid.updateGrid();
-                                ((ViewGroup)dragged.getParent()).removeView(dragged);
-                                if(Blocks.blockLayout.getChildCount()<1)Blocks.generateBlocks();
+                            }
+                            if(!anyPlaceable){
+                                //TODO: end and restart game
                             }
                         }
                         return true;

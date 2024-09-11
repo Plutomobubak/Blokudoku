@@ -181,6 +181,25 @@ public class Blocks {
                         {1,1,1},
                         {0,0,1}
                 }),
+                // Zzzz
+                new Block(new int[][]{
+                        {0,1},
+                        {1,1},
+                        {1,0}
+                }),
+                new Block(new int[][]{
+                        {1,0},
+                        {1,1},
+                        {0,1}
+                }),
+                new Block(new int[][]{
+                        {0,1,1},
+                        {1,1,0},
+                }),
+                new Block(new int[][]{
+                        {1,1,0},
+                        {0,1,1},
+                }),
                 // Blocks
                 new Block(new int[][]{
                         {1,1},

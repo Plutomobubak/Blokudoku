@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         mainConstraints.clone(mainLayout);
 
         // Constrain the gridLayout below the title TextView
-        mainConstraints.connect(gridLayout.getId(), ConstraintSet.TOP, R.id.title, ConstraintSet.BOTTOM, 32);
+        mainConstraints.connect(gridLayout.getId(), ConstraintSet.TOP, R.id.score, ConstraintSet.BOTTOM, 32);
         mainConstraints.connect(gridLayout.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
         mainConstraints.connect(gridLayout.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
 
@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         mainConstraints.applyTo(mainLayout);
 
         Blocks.init(this,blockLayout);
+        ScoreManager.init(Grid.grid,findViewById(R.id.score));
         Blocks.generateBlocks();
     }
 }

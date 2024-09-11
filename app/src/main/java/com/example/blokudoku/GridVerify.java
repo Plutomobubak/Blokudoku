@@ -30,7 +30,6 @@ public class GridVerify {
             for (int j = 0; j < grid[i].length; j++) {
                 sum+=grid[i][j];
             }
-            Log.d("row","R"+i+" "+sum);
             if (sum>8) results.add(new int[]{
                     0,i
             });
@@ -43,8 +42,6 @@ public class GridVerify {
                 sum+=grid[j][i];
                 column.append(grid[j][i]);
             }
-            Log.d("col"+i,column.toString());
-            Log.d("col","C"+i+" "+sum);
             if (sum>8) results.add(new int[]{
                     1,i
             });
@@ -55,7 +52,6 @@ public class GridVerify {
             for (int j = 0; j < grid[i].length; j++) {
                 int x = (i%3)*3 + j%3;
                 int y = (i-(i%3)) + (j-(j%3))/3;
-                Log.d("ind",""+x+" "+y);
                 sum+=grid[x][y];
             }
             if (sum>8) results.add(new int[]{
@@ -64,14 +60,19 @@ public class GridVerify {
         }
         return results;
     }
-    public static int[][] deleteConnected(ArrayList<int[]> connected, int[][] grid){
+    public static int deleteConnected(ArrayList<int[]> connected, int[][] grid){
+        int deleted=0;
         for(int[] res:connected){
             switch(res[0]) {
                 case 0:
-                    Arrays.fill(grid[res[1]], 0);
+                    for (int i = 0; i < grid.length; i++) {
+                        deleted += grid[res[1]][i];
+                        grid[res[1]][i] = 0;
+                    }
                     break;
                 case 1:
                     for (int i = 0; i < grid.length; i++) {
+                        deleted += grid[i][res[1]];
                         grid[i][res[1]] = 0;
                     }
                     break;
@@ -79,11 +80,12 @@ public class GridVerify {
                     for (int i = 0; i < grid[res[1]].length; i++) {
                         int x = (res[1]%3)*3 + i%3;
                         int y = (res[1]-(res[1]%3)) + (i-(i%3))/3;
+                        deleted+=grid[x][y];
                         grid[x][y] = 0;
                     }
                     break;
             }
         }
-        return grid;
+        return deleted;
     }
 }
