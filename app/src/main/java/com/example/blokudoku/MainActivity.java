@@ -12,7 +12,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -61,15 +60,13 @@ public class MainActivity extends AppCompatActivity {
                 Grid.updateGrid();
             }
             int[] blocks = GameStateManager.loadBlocks(this);
-            if (blocks.length > 0) {
-                for (int block : blocks) {
-                    Blocks.renderBlock(this, blockLayout, block);
-                }
+            for (int block : blocks) {
+                Blocks.renderBlock(this, blockLayout, block);
             }
         }
         else {
             Blocks.generateBlocks();
         }
-        ScoreManager.init(Grid.grid,findViewById(R.id.score),findViewById(R.id.popup),mainLayout,score);
+        ScoreManager.init(findViewById(R.id.score),findViewById(R.id.popup),score);
     }
 }

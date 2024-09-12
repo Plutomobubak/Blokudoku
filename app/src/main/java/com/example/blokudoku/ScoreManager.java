@@ -1,26 +1,27 @@
 package com.example.blokudoku;
 
-import android.content.Context;
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.AccelerateDecelerateInterpolator;
+
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
+
 
 public class ScoreManager {
     private static TextView scoreView;
     private static TextView popup;
-    private static ConstraintLayout main;
+    private static AnimatorSet anim;
     private static int streak;
     public static int score;
-    public static void init(int [][] grid, TextView scoreView, TextView popup, ConstraintLayout main,int score){
+    public static void init(TextView scoreView, TextView popup,int score){
         ScoreManager.scoreView = scoreView;
         ScoreManager.score=score;
         ScoreManager.streak=0;
@@ -33,7 +34,40 @@ public class ScoreManager {
         popup.bringToFront();
         popup.setVisibility(View.GONE);
         ScoreManager.popup=popup;
-        ScoreManager.main = main;
+
+        // Slide down
+        ObjectAnimator slideDown = ObjectAnimator.ofFloat(popup, "translationY", -100, 0);
+        slideDown.setDuration(500);
+
+        // Fade out
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(popup, "alpha", 1.0f, 0.0f);
+        fadeOut.setDuration(500);
+        fadeOut.setStartDelay(500);
+
+        // Combine the animations
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playSequentially(slideDown, fadeOut);
+        animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
+        // Start the animation
+        animatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                popup.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+            }
+        });
+        anim = animatorSet;
     }
     public static void updateScore(int deleted, int combo, int added, int[] index){
         // Update score
@@ -48,52 +82,25 @@ public class ScoreManager {
         ScoreManager.score+=scoreChange;
         Log.d("Score update","Del " + deleted + " Com " +combo+ " Add " + added + " Streak " + streak);
         // Score popup
-        ConstraintSet constraintSet = new ConstraintSet();
-        constraintSet.clone(main);
-
-        // Change margins for the target view
-        constraintSet.setMargin(popup.getId(), ConstraintSet.TOP, 100*index[0]); // Top margin = 50px
-        constraintSet.setMargin(popup.getId(), ConstraintSet.START, 100+100*index[1]); // Start margin = 100px
-
-        // Apply the updated constraints to the layout
-        constraintSet.applyTo(main);
-
+//        ConstraintSet constraintSet = new ConstraintSet();
+//        constraintSet.clone(main);
+//
+//        // Change margins for the target view
+//        constraintSet.setMargin(popup.getId(), ConstraintSet.TOP, 100*index[0]); // Top margin = 50px
+//        constraintSet.setMargin(popup.getId(), ConstraintSet.START, 100+100*index[1]); // Start margin = 100px
+//
+//        // Apply the updated constraints to the layout
+//        constraintSet.applyTo(main);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) popup.getLayoutParams();
+        params.topMargin = 100 * index[0];
+        params.leftMargin = 100 + 100 * index[1];
+        popup.setLayoutParams(params);
+        popup.requestLayout();
         popup.setText(String.format("+%d", scoreChange));
 
-        Animation slideDown = new TranslateAnimation(0, 0, -100, 0);
-        slideDown.setDuration(500);
-
-        // Set a fade-out animation after slide-down
-        Animation fadeOut = new AlphaAnimation(1.0f, 0.0f);
-        fadeOut.setDuration(500);
-        fadeOut.setStartOffset(500); // Delay before fading out
-
-        // Combine the animations
-        AnimationSet animationSet = new AnimationSet(true);
-        animationSet.addAnimation(slideDown);
-        animationSet.addAnimation(fadeOut);
-
-        // Show the TextView
         popup.setVisibility(View.VISIBLE);
 
-        // Start the animation
-        popup.startAnimation(animationSet);
-
-        // Hide the TextView after the animation ends
-        animationSet.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                popup.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
+        anim.start();
         // Score display
         scoreView.setText(String.format("Score: %d", ScoreManager.score));
     }
