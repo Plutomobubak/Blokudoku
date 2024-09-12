@@ -7,18 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="342dp"
-        android:layout_height="66dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:text="Balls"
-        android:textAlignment="center"
-        android:textSize="48sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <LinearLayout
         android:id="@+id/blocks"
         android:layout_width="380dp"
@@ -27,17 +15,34 @@
         android:layout_marginBottom="16dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"></LinearLayout>
+        app:layout_constraintStart_toStartOf="parent">
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/score"
-        android:layout_width="140dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="168dp"
         android:text="Score: 0"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/popup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp"
+        android:text="+1"
+        android:textColor="#FFAC00"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:typeface="normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/score" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

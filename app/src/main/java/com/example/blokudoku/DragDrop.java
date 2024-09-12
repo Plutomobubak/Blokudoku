@@ -1,6 +1,7 @@
 package com.example.blokudoku;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
@@ -134,11 +135,12 @@ public class DragDrop {
                             ArrayList<int[]> res = GridVerify.verifyConnected(Grid.grid);
                             int deleted = GridVerify.deleteConnected(res,Grid.grid);
                             Grid.updateGrid();
-                            ScoreManager.updateScore(deleted,res.size(),blockSize);
                             ((ViewGroup)dragged.getParent()).removeView(dragged);
+                            ScoreManager.updateScore(deleted,res.size(),blockSize, index);
                             if(Blocks.blockLayout.getChildCount()<1)Blocks.generateBlocks();
                             // update placeability
                             boolean anyPlaceable = false;
+                            ArrayList<Integer> activeBlocks = new ArrayList<>();
                             for (Block block:blocks) {
                                 for (ConstraintLayout view : block.views) {
                                     for (int i = 0; i < view.getChildCount(); i++) {
@@ -148,10 +150,14 @@ public class DragDrop {
                                             ((GradientDrawable)view.getChildAt(i).getBackground()).setColor(placeable? Color.parseColor("#3333ff"):Color.parseColor("#ccccff"));
                                         }
                                     }
+                                    activeBlocks.add(Arrays.asList(Blocks.blocks).indexOf(block));
                                 }
                             }
+                            GameStateManager.saveGameState(context,activeBlocks.stream().mapToInt(i -> i).toArray(),Grid.grid,ScoreManager.score);
                             if(!anyPlaceable){
                                 //TODO: end and restart game
+                                Intent intent = new Intent(context, Menu.class);
+                                context.startActivity(intent);
                             }
                         }
                         return true;

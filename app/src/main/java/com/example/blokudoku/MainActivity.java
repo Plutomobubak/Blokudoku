@@ -1,5 +1,6 @@
 package com.example.blokudoku;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -28,9 +29,9 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        TextView title = findViewById(R.id.title);
-        title.setText("Blokucocku");
 
+        Intent intent = getIntent();
+        boolean load = intent.getBooleanExtra("LOAD", false);
         // Find the main ConstraintLayout from the XML
         ConstraintLayout mainLayout = findViewById(R.id.main);
         LinearLayout blockLayout = findViewById(R.id.blocks);
@@ -49,9 +50,26 @@ public class MainActivity extends AppCompatActivity {
 
         // Apply the constraints to the main layout
         mainConstraints.applyTo(mainLayout);
+        int score = 0;
+        Blocks.init(this, blockLayout);
+        if(load){
+            score = GameStateManager.loadScore(this);
 
-        Blocks.init(this,blockLayout);
-        ScoreManager.init(Grid.grid,findViewById(R.id.score));
-        Blocks.generateBlocks();
+            int[][] grid = GameStateManager.loadGrid(this);
+            if (grid.length > 8) {
+                Grid.grid = grid;
+                Grid.updateGrid();
+            }
+            int[] blocks = GameStateManager.loadBlocks(this);
+            if (blocks.length > 0) {
+                for (int block : blocks) {
+                    Blocks.renderBlock(this, blockLayout, block);
+                }
+            }
+        }
+        else {
+            Blocks.generateBlocks();
+        }
+        ScoreManager.init(Grid.grid,findViewById(R.id.score),findViewById(R.id.popup),mainLayout,score);
     }
 }
