@@ -156,6 +156,7 @@ public class DragDrop {
                             GameStateManager.saveGameState(context,activeBlocks.stream().mapToInt(i -> i).toArray(),Grid.grid,ScoreManager.score);
                             if(!anyPlaceable){
                                 //TODO: end and restart game
+                                Leaderboards.postScore(GameStateManager.getUID(context),GameStateManager.getName(context),ScoreManager.score);
                                 Intent intent = new Intent(context, Menu.class);
                                 context.startActivity(intent);
                             }

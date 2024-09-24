@@ -3,11 +3,34 @@ package com.example.blokudoku;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.UUID;
+
 public class GameStateManager {
     private static final String PREFS_NAME = "game_state";
     private static final String KEY_1D_ARRAY = "blocks";
     private static final String KEY_2D_ARRAY = "grid";
     private static final String KEY_SCORE = "score";
+    private static final String CREDS = "credentials";
+    private static final String UID = "uid";
+    private static final String NAME = "name";
+
+    public static String getUID(Context context){
+        SharedPreferences preferences = context.getSharedPreferences(CREDS, Context.MODE_PRIVATE);
+        return preferences.getString(UID,"");
+    }
+    public static String getName(Context context){
+        SharedPreferences preferences = context.getSharedPreferences(CREDS, Context.MODE_PRIVATE);
+        return preferences.getString(NAME,"");
+    }
+
+    public static void generateUID(Context context){
+        SharedPreferences preferences = context.getSharedPreferences(CREDS, Context.MODE_PRIVATE);
+        preferences.edit().putString(UID, UUID.randomUUID().toString()).apply();
+    }
+    public static void setName(Context context, String name){
+        SharedPreferences preferences = context.getSharedPreferences(CREDS, Context.MODE_PRIVATE);
+        preferences.edit().putString(NAME, name).apply();
+    }
 
     public static void saveGameState(Context context, int[] blocks, int[][] grid, int score) {
         SharedPreferences preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
